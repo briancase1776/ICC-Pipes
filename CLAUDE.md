@@ -8,8 +8,8 @@ what is plugged into either one. This skill is the cable. Nothing more.
 
 ## What this is
 
-- A **pipe**: a named, bidirectional channel one Claude can open and another
-  Claude can attach to.
+- A **pipe**: a bidirectional channel at a path. Whoever has the path can
+  attach to either end. Whoever created it need not hold an end.
 - The skill covers creating, listing, and removing pipes. Attaching is
   opening the path. Nothing else.
 

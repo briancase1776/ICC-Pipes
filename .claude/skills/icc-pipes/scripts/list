@@ -1,10 +1,10 @@
 #!/bin/sh
-# list: one line per pipe, "NAME up" or "NAME down". Up means the hold still has the FIFO open.
+# list: one line per pipe, "DIR up" or "DIR down". Up means the hold still has the FIFO open.
 root=/tmp/icc-pipes
 for d in "$root"/*/; do
   [ -d "$d" ] || continue
   d=${d%/}
   p=$(cat "$d/pid" 2>/dev/null)
   if [ "$(readlink "/proc/$p/fd/3" 2>/dev/null)" = "$d/0" ]; then s=up; else s=down; fi
-  echo "${d##*/} $s"
+  echo "$d $s"
 done

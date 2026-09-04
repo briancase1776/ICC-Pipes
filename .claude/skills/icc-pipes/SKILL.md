@@ -5,23 +5,25 @@ description: Create, list, and remove named pipes between Claude instances in on
 
 # icc-pipes
 
-A pipe is a name. Under it, two FIFOs, held open by one background process:
+A pipe is a fresh directory under /tmp/icc-pipes holding two FIFOs,
+kept open by one background process:
 
-    /tmp/icc-pipes/NAME/0
-    /tmp/icc-pipes/NAME/1
+    /tmp/icc-pipes/XXXXXXXX/0
+    /tmp/icc-pipes/XXXXXXXX/1
 
 One side writes 0 and reads 1. The other side writes 1 and reads 0.
 Which side you are is agreed outside this skill, like which end of a
-cable you are holding.
+cable you are holding. Whoever ran create laid the cable; it need not
+hold either end.
 
 ## Operations
 
-    scripts/create NAME    make the pipe, hold it open, print its directory
-    scripts/list           one line per pipe: NAME up|down
-    scripts/remove NAME    drop the hold, delete the pipe
+    scripts/create         make a fresh pipe, hold it open, print its directory
+    scripts/list           one line per pipe: DIR up|down
+    scripts/remove DIR     drop the hold, delete the pipe
 
 To attach, open the path. There is nothing else to do. A wider link is
-another pipe with another name.
+another create.
 
 ## Facts about the pipe
 
