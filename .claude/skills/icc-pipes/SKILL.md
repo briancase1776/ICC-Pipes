@@ -39,7 +39,9 @@ These are properties of a Linux FIFO. The skill adds nothing to them.
 
 - A write of at most 4096 bytes (PIPE_BUF) lands whole. Larger writes
   can interleave with another writer's.
-- Each FIFO buffers 64K. A write past that blocks until someone reads.
+- Each lane buffers 64K. A write past that blocks until someone reads.
+  Lanes fill and drain independently, so N lanes is N times the bytes in
+  flight. More lanes is more bandwidth, nothing else.
 - A read on an empty FIFO blocks, and never sees EOF while the pipe is
   up, because the hold keeps a writer open. Bound every read (timeout,
   nonblocking) or the call hangs.
