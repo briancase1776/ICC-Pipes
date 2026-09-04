@@ -35,18 +35,27 @@ To attach, open the path. There is nothing else to do.
 
 ## Facts about the pipe
 
-These are properties of a Linux FIFO. The skill adds nothing to them.
+These are properties of a FIFO. The skill adds nothing to them. Where
+Linux and POSIX differ, both are given; this skill is Linux.
 
-- A write of at most 4096 bytes (PIPE_BUF) lands whole. Larger writes
-  can interleave with another writer's.
-- Each lane buffers 64K. A write past that blocks until someone reads.
-  Lanes fill and drain independently, so N lanes is N times the bytes in
-  flight. More lanes is more bandwidth, nothing else.
-- A read on an empty FIFO blocks, and never sees EOF while the pipe is
+- A write of at most PIPE_BUF bytes lands whole. Larger writes can
+  interleave with another writer's. PIPE_BUF is 4096 on Linux; POSIX
+  promises only 512. `getconf PIPE_BUF /tmp` says.
+- Each lane buffers 64K on Linux; POSIX promises only PIPE_BUF. A write
+  past the buffer blocks until someone reads. Lanes fill and drain
+  independently, so N lanes is N times the bytes in flight. More lanes
+  is more bandwidth, nothing else.
+- A read on an empty lane blocks, and never sees EOF while the pipe is
   up, because the hold keeps a writer open. Bound every read (timeout,
   nonblocking) or the call hangs.
 - Bytes read are gone. Nothing is kept.
 - Order holds within one lane and nowhere else.
+- The hold opens every lane O_RDWR. On Linux that open never blocks.
+  POSIX leaves it undefined.
+- The holder is `sleep infinity`. The pipe's path is in its open file
+  descriptors, not its argv, so `pkill -f` on the path finds nothing
+  but the shell that expanded it. Find a holder under /proc/PID/fd,
+  as list does.
 - If the hold dies (list says down), opens and writes can block.
   remove it and create it again.
 
