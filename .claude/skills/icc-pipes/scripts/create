@@ -1,8 +1,17 @@
 #!/bin/sh
-# create: make a fresh pipe, hold it open, print its directory.
+# create [N]: make a fresh pipe of N lanes (even, default 2), hold every lane
+# open, print its directory. Even lanes go one way, odd lanes the other.
 set -eu
+n=${1:-2}
+[ "$n" -gt 0 ] && [ $((n % 2)) -eq 0 ] ||
+  { echo "lanes must be even" >&2; exit 1; }
 d=$(mktemp -d /tmp/icc-pipes-XXXXXXXX)
-mkfifo "$d/0" "$d/1"
-sleep infinity 3<>"$d/0" 4<>"$d/1" </dev/null >/dev/null 2>&1 &
+fds=; l=0
+while [ "$l" -lt "$n" ]; do
+  mkfifo "$d/$l"
+  fds="$fds $((l + 3))<>'$d/$l'"
+  l=$((l + 1))
+done
+eval "sleep infinity $fds </dev/null >/dev/null 2>&1 &"
 echo $! > "$d/pid"
 echo "$d"

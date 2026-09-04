@@ -1,9 +1,11 @@
 #!/bin/sh
-# list: one line per pipe, "DIR up" or "DIR down". Up means the hold still has the FIFO open.
+# list: one line per pipe, "DIR up" or "DIR down".
+# Up means the hold still has lane 0 open.
 for d in /tmp/icc-pipes-*/; do
   [ -d "$d" ] || continue
   d=${d%/}
   p=$(cat "$d/pid" 2>/dev/null)
-  if [ "$(readlink "/proc/$p/fd/3" 2>/dev/null)" = "$d/0" ]; then s=up; else s=down; fi
+  s=down
+  [ "$(readlink "/proc/$p/fd/3" 2>/dev/null)" = "$d/0" ] && s=up
   echo "$d $s"
 done

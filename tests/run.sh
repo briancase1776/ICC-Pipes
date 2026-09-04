@@ -1,14 +1,14 @@
 #!/bin/sh
-# Prove the pipe: create it, push bytes each way, see them arrive, remove it.
+# Prove the pipe: create it, push bytes down every lane, see them arrive,
+# remove it.
 set -eu
 cd "$(dirname "$0")/../.claude/skills/icc-pipes"
-d=$(scripts/create)
+! scripts/create 3 2>/dev/null
+d=$(scripts/create 4)
 trap 'scripts/remove "$d" 2>/dev/null || :' EXIT
 scripts/list | grep -qx "$d up"
-printf 'one\n' > "$d/0"
-printf 'two\n' > "$d/1"
-[ "$(timeout 1 cat "$d/1")" = two ]
-[ "$(timeout 1 cat "$d/0")" = one ]
+for l in 0 1 2 3; do printf '%s\n' "lane $l" > "$d/$l"; done
+for l in 0 1 2 3; do [ "$(timeout 1 cat "$d/$l")" = "lane $l" ]; done
 scripts/remove "$d"
 [ ! -d "$d" ]
 trap - EXIT
