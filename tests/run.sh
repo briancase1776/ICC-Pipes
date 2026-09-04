@@ -1,7 +1,7 @@
 #!/bin/sh
 # Prove the pipe: create it, push bytes each way, see them arrive, remove it.
 set -eu
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.claude/skills/icc-pipes"
 n=test-$$
 trap 'scripts/remove "$n" 2>/dev/null || :' EXIT
 d=$(scripts/create "$n")

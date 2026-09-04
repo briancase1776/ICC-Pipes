@@ -54,9 +54,9 @@ not the test.
 ## Layout
 
 ```
-SKILL.md      the skill definition Claude Code loads
-scripts/      create, list, remove. One small script each.
-tests/        the minimal harness described above
+.claude/skills/icc-pipes/SKILL.md     the skill definition Claude Code loads
+.claude/skills/icc-pipes/scripts/     create, list, remove. One small script each.
+tests/                                the minimal harness described above
 ```
 
 Do not add directories without a reason that fits the scope above.
