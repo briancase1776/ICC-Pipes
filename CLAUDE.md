@@ -3,35 +3,43 @@
 A Claude Code skill that creates pipes between Claude instances. That is the
 whole project.
 
+Think of a cat-5 cable. It carries bytes between two ends and has no idea
+what is plugged into either one. This skill is the cable. Nothing more.
+
 ## What this is
 
 - A **pipe**: a named, bidirectional channel one Claude can open and another
   Claude can attach to.
-- The skill covers creating, listing, attaching to, and removing pipes.
-  Nothing else.
+- The skill covers creating, listing, and removing pipes. Attaching is
+  opening the path. Nothing else.
 
 ## What this is not
 
 Out of scope. Do not build, stub, or "leave room for" any of these:
 
-- Message formats, protocols, schemas, or envelopes for what goes through a pipe.
+- Message formats, protocols, schemas, framing, or envelopes for what goes
+  through a pipe. Not even a line convention or a timestamp.
 - How a Claude decides what to write or how it interprets what it reads.
-- Routing, brokers, discovery services, registries, or hubs.
-- Persistence, replay, history, or logging of pipe contents.
+- Routing, brokers, discovery services, registries, hubs, or topology.
+- Persistence, replay, history, ledgers, or logging of pipe contents.
+- Liveness, heartbeats, peer-death detection, or EOF markers.
 - Auth, encryption, permissions, or multi-user anything.
 - Retries, backpressure, queues, or delivery guarantees beyond what the
   underlying OS primitive already gives.
-- Config files, plugins, or extension points.
+- Other transports (git, maildirs, platform messaging) or bridges to them.
+- Config files, plugins, options, or extension points.
 
 If a request touches any of the above, stop and say it is out of scope. Do
-not add it.
+not add it. Before adding anything, ask: is this the cable, or something
+that plugs into the cable? Only the cable belongs here.
 
 ## Testing
 
-A test harness is allowed **only to prove the pipe works**: open it, attach to
-it, push bytes one way, see them arrive the other way, close it. The harness
-must not grow into a client, protocol, or example app. If a test needs more
-than a few lines of setup, the pipe is too complicated, not the test.
+A test harness is allowed **only to prove the pipe works**: create it, push
+bytes one way, see them arrive the other way, both directions, remove it.
+The harness must not grow into a client, protocol, or example app. If a
+test needs more than a few lines of setup, the pipe is too complicated,
+not the test.
 
 ## Rules
 
@@ -40,14 +48,14 @@ than a few lines of setup, the pipe is too complicated, not the test.
 - **Small.** If a file is getting long, you are adding scope, not features.
 - **No speculative work.** Build what is asked, not what might be asked later.
 - **No abstraction until there are two real callers.**
-- Before adding anything, ask: is this the pipe, or something that uses the
-  pipe? Only the pipe belongs here.
+- **Facts, not recipes.** SKILL.md states what the OS primitive does. It does
+  not tell the caller how to read, write, wait, or poll.
 
 ## Layout
 
 ```
 SKILL.md      the skill definition Claude Code loads
-scripts/      the pipe operations, one small script each
+scripts/      create, list, remove. One small script each.
 tests/        the minimal harness described above
 ```
 

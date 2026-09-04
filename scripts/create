@@ -1,0 +1,13 @@
+#!/bin/sh
+# create NAME: make the pipe, hold it open, print its directory.
+set -eu
+root=/tmp/icc-pipes
+name=${1:?usage: create NAME}
+case $name in */*|.|..) echo "bad name: $name" >&2; exit 1;; esac
+d=$root/$name
+mkdir -p "$root"
+mkdir "$d"
+mkfifo "$d/0" "$d/1"
+sleep infinity 3<>"$d/0" 4<>"$d/1" </dev/null >/dev/null 2>&1 &
+echo $! > "$d/pid"
+echo "$d"

@@ -1,0 +1,10 @@
+#!/bin/sh
+# remove NAME: drop the hold, delete the pipe.
+set -eu
+root=/tmp/icc-pipes
+name=${1:?usage: remove NAME}
+case $name in */*|.|..) echo "bad name: $name" >&2; exit 1;; esac
+d=$root/$name
+[ -d "$d" ] || { echo "no such pipe: $name" >&2; exit 1; }
+kill "$(cat "$d/pid")" 2>/dev/null || :
+rm -rf "$d"
