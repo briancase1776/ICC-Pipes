@@ -55,7 +55,7 @@ not the test.
 
 ```
 .claude/skills/icc-pipes/SKILL.md     the skill definition Claude Code loads
-.claude/skills/icc-pipes/scripts/     create, list, remove. One small script each.
+.claude/skills/icc-pipes/scripts/     create, list, remove. One script each.
 tests/                                the minimal harness described above
 ```
 

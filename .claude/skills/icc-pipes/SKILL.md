@@ -1,6 +1,10 @@
 ---
 name: icc-pipes
-description: Create, list, and remove named pipes between Claude instances in one container. Transport only. A pipe is two FIFOs, one each way, held open so nothing blocks on open. What goes through it, and what it means, is the caller's business.
+description: >-
+  Create, list, and remove named pipes between Claude instances in one
+  container. Transport only. A pipe is two FIFOs, one each way, held open so
+  nothing blocks on open. What goes through it, and what it means, is the
+  caller's business.
 ---
 
 # icc-pipes
