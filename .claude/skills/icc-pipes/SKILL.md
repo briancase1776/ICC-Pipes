@@ -5,11 +5,11 @@ description: Create, list, and remove named pipes between Claude instances in on
 
 # icc-pipes
 
-A pipe is a fresh directory under /tmp/icc-pipes holding two FIFOs,
+A pipe is a fresh directory holding two FIFOs,
 kept open by one background process:
 
-    /tmp/icc-pipes/XXXXXXXX/0
-    /tmp/icc-pipes/XXXXXXXX/1
+    /tmp/icc-pipes-XXXXXXXX/0
+    /tmp/icc-pipes-XXXXXXXX/1
 
 One side writes 0 and reads 1. The other side writes 1 and reads 0.
 Which side you are is agreed outside this skill, like which end of a
@@ -47,5 +47,5 @@ pipe outlives calls. A foreground read that does not return hangs the
 tool call until the harness times it out.
 
 Seats in one session share the container, so they share
-/tmp/icc-pipes. Sessions do not share a container; no pipe crosses
+/tmp. Sessions do not share a container; no pipe crosses
 that line.
