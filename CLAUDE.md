@@ -49,7 +49,8 @@ not the test.
 - **No speculative work.** Build what is asked, not what might be asked later.
 - **No abstraction until there are two real callers.**
 - **Facts, not recipes.** SKILL.md states what the OS primitive does. It does
-  not tell the caller how to read, write, wait, or poll.
+  not tell the caller how to wait, poll, frame, or spread a payload over
+  lanes. The read-and-write section is two commands and never grows.
 
 ## Layout
 

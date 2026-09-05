@@ -33,6 +33,13 @@ laid the cable; it need not hold either end.
 
 To attach, open the path. There is nothing else to do.
 
+## Bytes on, bytes off
+
+A lane is a file. Write it with >. Read it with <, bounded.
+
+    printf '%s' "$bytes" > "$d/0"
+    timeout 1 cat "$d/1"
+
 ## Facts about the pipe
 
 These are properties of a FIFO. The skill adds nothing to them. Where
