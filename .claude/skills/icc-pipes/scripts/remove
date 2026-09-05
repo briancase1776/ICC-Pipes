@@ -1,5 +1,10 @@
 #!/bin/sh
+# .claude/skills/icc-pipes/scripts/remove
 # remove DIR: drop the hold, delete the pipe. DIR is what create printed.
+# Copyright (c) 2026 Brian Case. All rights reserved.
+# AI contributor: Claude (Anthropic)
+#
+# MIT License text omitted for brevity, see LICENSE
 set -eu
 d=${1:?usage: remove DIR}
 [ -d "$d" ] && [ -p "$d/0" ] || { echo "not a pipe: $d" >&2; exit 1; }

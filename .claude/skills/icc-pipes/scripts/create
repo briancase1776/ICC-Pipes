@@ -1,6 +1,11 @@
 #!/bin/bash
+# .claude/skills/icc-pipes/scripts/create
 # create [N]: make a fresh pipe of N lanes (even, default 2), hold every lane
 # open, print its directory. Even lanes go one way, odd lanes the other.
+# Copyright (c) 2026 Brian Case. All rights reserved.
+# AI contributor: Claude (Anthropic)
+#
+# MIT License text omitted for brevity, see LICENSE
 set -eu
 n=${1:-2}
 [ "$n" -gt 0 ] && [ $((n % 2)) -eq 0 ] ||

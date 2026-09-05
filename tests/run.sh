@@ -1,6 +1,11 @@
 #!/bin/sh
+# tests/run.sh
 # Prove the pipe: create it, push bytes down every lane, see them arrive,
 # remove it.
+# Copyright (c) 2026 Brian Case. All rights reserved.
+# AI contributor: Claude (Anthropic)
+#
+# MIT License text omitted for brevity, see LICENSE
 set -eu
 cd "$(dirname "$0")/../.claude/skills/icc-pipes"
 ! scripts/create 3 2>/dev/null
