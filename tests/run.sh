@@ -5,7 +5,7 @@
 # Copyright (c) 2026 Brian Case. All rights reserved.
 # AI contributor: Claude (Anthropic)
 #
-# MIT License text omitted for brevity, see LICENSE
+# MIT License text omitted for brevity, See LICENCE.TXT
 set -eu
 cd "$(dirname "$0")/../.claude/skills/icc-pipes"
 ! scripts/create 3 2>/dev/null

@@ -4,7 +4,7 @@
 # Copyright (c) 2026 Brian Case. All rights reserved.
 # AI contributor: Claude (Anthropic)
 #
-# MIT License text omitted for brevity, see LICENSE
+# MIT License text omitted for brevity, See LICENCE.TXT
 set -eu
 d=${1:?usage: remove DIR}
 [ -d "$d" ] && [ -p "$d/0" ] || { echo "not a pipe: $d" >&2; exit 1; }
