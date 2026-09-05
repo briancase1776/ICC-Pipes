@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # create [N]: make a fresh pipe of N lanes (even, default 2), hold every lane
 # open, print its directory. Even lanes go one way, odd lanes the other.
 set -eu

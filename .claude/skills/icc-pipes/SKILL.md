@@ -59,6 +59,8 @@ Linux and POSIX differ, both are given; this skill is Linux.
 - Order holds within one lane and nowhere else.
 - The hold opens every lane O_RDWR. On Linux that open never blocks.
   POSIX leaves it undefined.
+- create is bash, not sh. dash cannot redirect a two-digit fd, so under
+  sh no lane past 6 is held.
 - The holder is `sleep infinity`. The pipe's path is in its open file
   descriptors, not its argv, so `pkill -f` on the path finds nothing
   but the shell that expanded it. Find a holder under /proc/PID/fd,
