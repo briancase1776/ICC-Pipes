@@ -39,6 +39,14 @@ for l in 0 2; do
   [ "$r" = "$tok $l back" ]
 done
 wait
+# The read SKILL.md teaches, from the end that did not write it: it gets the
+# bytes and still exits 124, because the hold leaves no EOF to end it early.
+# Only $( ) discarding that status keeps this line from ending the harness.
+( printf 'bound\n' > "$d/1" ) &
+r=0; out=$(timeout 1 cat "$d/1") || r=$?
+[ "$out" = bound ]
+[ "$r" -eq 124 ]
+wait
 scripts/remove "$d"
 [ ! -d "$d" ]
 trap - EXIT
