@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # .claude/skills/icc-pipes/scripts/remove
 # remove DIR: drop the hold, delete the pipe. DIR is what create printed.
 # Copyright (c) 2026 Brian Case. All rights reserved.
