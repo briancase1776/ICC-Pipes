@@ -13,9 +13,12 @@ scripts/create 09 2>/dev/null && exit 1
 # a create that cannot finish leaves nothing behind. Counted, not emptied:
 # other pipes may be up beside this one.
 t=$(mktemp -d); printf '#!/bin/sh\nexit 1\n' > "$t/mkfifo"; chmod +x "$t/mkfifo"
-was=$(ls -d /tmp/icc-pipes-*/ 2>/dev/null | wc -l)
+was=$(ls -d /tmp/icc-pipes-*/ 2>/dev/null || :)
 PATH=$t:$PATH scripts/create 2 2>/dev/null && exit 1
-[ "$(ls -d /tmp/icc-pipes-*/ 2>/dev/null | wc -l)" -eq "$was" ]
+( ulimit -n 30; scripts/create 40 2>/dev/null ) && exit 1
+for x in $(ls -d /tmp/icc-pipes-*/ 2>/dev/null || :); do
+  printf '%s\n' "$was" | grep -qxF "$x" || [ -n "$(ls -A "$x")" ]
+done
 rm -rf "$t"
 d=$(scripts/create 4)
 trap 'scripts/remove "$d" 2>/dev/null || :' EXIT
