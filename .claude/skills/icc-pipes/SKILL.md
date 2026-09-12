@@ -16,6 +16,11 @@ going one way, all kept open by one background process:
     /tmp/icc-pipes-XXXXXXXX/1
     ...
     /tmp/icc-pipes-XXXXXXXX/N-1
+    /tmp/icc-pipes-XXXXXXXX/pid    the hold's process id, not a lane
+
+`pid` is the only thing in there that is not a FIFO. list reads it to say
+up or down, and remove reads it to know what to kill, so a glob of the
+directory catches it and writing over it breaks both.
 
 One side writes the even lanes and reads the odd ones. The other side
 writes the odd lanes and reads the even ones. Lanes 0 and 1 are a pair,
