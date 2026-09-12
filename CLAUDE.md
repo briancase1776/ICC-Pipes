@@ -55,6 +55,13 @@ overriding the interpreter, not the harness being broken.
 - **Facts, not recipes.** SKILL.md states what the OS primitive does. It does
   not tell the caller how to wait, poll, frame, or spread a payload over
   lanes. The read-and-write section is two commands and never grows.
+- **Bash, and the shebang decides.** Every script here is bash and says so on
+  its first line. Run one by its path and let that line choose the
+  interpreter. Never reach for `sh script` or `bash script`: that overrides
+  what the file declares, and a script that runs today only because the
+  caller forced dash on it will break the day it uses anything bash has.
+  ICC's runner called every piece with `sh` and failed the moment this
+  harness stopped being POSIX.
 
 ## Layout
 
