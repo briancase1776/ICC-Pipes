@@ -17,6 +17,11 @@ case $n in
 esac
 [ "$n" -gt 0 ] || { echo "lanes must be more than zero" >&2; exit 1; }
 d=$(mktemp -d /tmp/icc-pipes-XXXXXXXX)
+# Until the pipe is whole, it is not a pipe: a create that cannot finish
+# takes its directory with it, and its hold if one started. h stays empty
+# until there is a hold, because kill 0 would signal the process group.
+h=
+trap '[ -n "$h" ] && kill "$h" 2>/dev/null || :; rm -rf "$d"' EXIT INT TERM
 fds=; l=0
 while [ "$l" -lt "$n" ]; do
   mkfifo "$d/$l"
@@ -24,5 +29,7 @@ while [ "$l" -lt "$n" ]; do
   l=$((l + 1))
 done
 eval "sleep infinity $fds </dev/null >/dev/null 2>&1 &"
-echo $! > "$d/pid"
+h=$!
+echo "$h" > "$d/pid"
+trap - EXIT INT TERM
 echo "$d"

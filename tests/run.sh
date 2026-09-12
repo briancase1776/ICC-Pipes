@@ -10,6 +10,13 @@ set -eu
 cd "$(dirname "$0")/../.claude/skills/icc-pipes"
 scripts/create 3 2>/dev/null && exit 1
 scripts/create 09 2>/dev/null && exit 1
+# a create that cannot finish leaves nothing behind. Counted, not emptied:
+# other pipes may be up beside this one.
+t=$(mktemp -d); printf '#!/bin/sh\nexit 1\n' > "$t/mkfifo"; chmod +x "$t/mkfifo"
+was=$(ls -d /tmp/icc-pipes-*/ 2>/dev/null | wc -l)
+PATH=$t:$PATH scripts/create 2 2>/dev/null && exit 1
+[ "$(ls -d /tmp/icc-pipes-*/ 2>/dev/null | wc -l)" -eq "$was" ]
+rm -rf "$t"
 d=$(scripts/create 4)
 trap 'scripts/remove "$d" 2>/dev/null || :' EXIT
 scripts/list | grep -qx "$d up"
