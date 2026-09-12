@@ -55,10 +55,19 @@ Linux and POSIX differ, both are given; this skill is Linux.
 - A read on an empty lane blocks, and never sees EOF while the pipe is
   up, because the hold keeps a writer open. Bound every read (timeout,
   nonblocking) or the call hangs.
+- A bounded read spends its whole bound. With no EOF the reader is still
+  waiting when the bound runs out, so `timeout 1 cat` prints what it got
+  and exits 124. That status is the bound, not a failure, and the read
+  costs the bound every time.
 - Bytes read are gone. Nothing is kept.
 - Order holds within one lane and nowhere else.
 - The hold opens every lane O_RDWR. On Linux that open never blocks.
   POSIX leaves it undefined.
+- Because a lane is open both ways, nothing stops a side reading the
+  lane it writes. A side that does takes its own bytes off the wire:
+  no error here, and nothing at the peer's end to show they were taken.
+  Which side writes which lane is agreed outside this skill, and nothing
+  here checks it.
 - The scripts are bash, not sh. dash cannot redirect a two-digit fd, so
   under sh create holds no lane past 6.
 - The holder is `sleep infinity`. The pipe's path is in its open file
