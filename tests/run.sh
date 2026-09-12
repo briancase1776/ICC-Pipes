@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # tests/run.sh
 # Prove the pipe: create it, push bytes down every lane, see them arrive,
 # remove it.
