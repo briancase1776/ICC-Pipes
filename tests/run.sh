@@ -9,6 +9,7 @@
 set -eu
 cd "$(dirname "$0")/../.claude/skills/icc-pipes"
 ! scripts/create 3 2>/dev/null
+scripts/create 09 2>/dev/null && exit 1
 d=$(scripts/create 4)
 trap 'scripts/remove "$d" 2>/dev/null || :' EXIT
 scripts/list | grep -qx "$d up"

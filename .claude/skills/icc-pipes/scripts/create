@@ -8,8 +8,14 @@
 # MIT License text omitted for brevity, See LICENCE.TXT
 set -eu
 n=${1:-2}
-[ "$n" -gt 0 ] && [ $((n % 2)) -eq 0 ] ||
-  { echo "lanes must be even" >&2; exit 1; }
+# Digits only, parity from the last digit, size from test(1). Arithmetic
+# expansion reads a leading zero as octal and the build loop does not, so
+# it is not used here: two readings of $n is what let an odd count past.
+case $n in
+  ''|*[!0-9]*) echo "lanes must be a positive whole number: $n" >&2; exit 1 ;;
+  *[13579])    echo "lanes must be even: $n" >&2; exit 1 ;;
+esac
+[ "$n" -gt 0 ] || { echo "lanes must be more than zero" >&2; exit 1; }
 d=$(mktemp -d /tmp/icc-pipes-XXXXXXXX)
 fds=; l=0
 while [ "$l" -lt "$n" ]; do
