@@ -1,20 +1,34 @@
 #!/bin/bash
 # tests/run.sh
-# Prove the pipe: create it, push bytes down every lane, see them arrive,
-# remove it.
+# Prove the pipe: create it, refuse a bad lane count, hand bytes from one
+# process to another and back again on every pair, remove it.
 # Copyright (c) 2026 Brian Case. All rights reserved.
 # AI contributor: Claude (Anthropic)
 #
 # MIT License text omitted for brevity, See LICENCE.TXT
 set -eu
 cd "$(dirname "$0")/../.claude/skills/icc-pipes"
-! scripts/create 3 2>/dev/null
+scripts/create 3 2>/dev/null && exit 1
 scripts/create 09 2>/dev/null && exit 1
 d=$(scripts/create 4)
 trap 'scripts/remove "$d" 2>/dev/null || :' EXIT
 scripts/list | grep -qx "$d up"
-for l in 0 1 2 3; do printf '%s\n' "lane $l" > "$d/$l"; done
-for l in 0 1 2 3; do [ "$(timeout 1 cat "$d/$l")" = "lane $l" ]; done
+# The other side is a child of this shell: it reads the even lanes and
+# answers on their odd partners, so nothing is read at the end that wrote
+# it, and every lane carries.
+( for l in 0 2; do
+    IFS= read -r -t 5 m < "$d/$l"
+    printf '%s back\n' "$m" > "$d/$((l + 1))"
+  done ) &
+# The token is made after the child is forked, so the child has no copy of
+# it and cannot answer with it unless the even lane carried it across.
+tok=$RANDOM-$RANDOM
+for l in 0 2; do printf '%s %s\n' "$tok" "$l" > "$d/$l"; done
+for l in 0 2; do
+  IFS= read -r -t 5 r < "$d/$((l + 1))"
+  [ "$r" = "$tok $l back" ]
+done
+wait
 scripts/remove "$d"
 [ ! -d "$d" ]
 trap - EXIT
