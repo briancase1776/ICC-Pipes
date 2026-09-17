@@ -73,6 +73,12 @@ Linux and POSIX differ, both are given; this skill is Linux.
   no error here, and nothing at the peer's end to show they were taken.
   Which side writes which lane is agreed outside this skill, and nothing
   here checks it.
+- Do not relay one lane into another. A process in the path is not part
+  of the pipe and holds bytes the lanes do not: 64K in each lane, plus
+  whatever it has read and not yet written when the chain wedges. A
+  `cat` between two lanes measured 152K to 192K over three runs, so
+  there is no figure to state. The bytes it took are gone from the lane
+  and are not at the peer.
 - The scripts are bash, not sh. dash cannot redirect a two-digit fd, so
   under sh create holds no lane past 6.
 - The holder is `sleep infinity`. The pipe's path is in its open file
