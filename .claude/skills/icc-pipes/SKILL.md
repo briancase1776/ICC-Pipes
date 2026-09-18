@@ -60,7 +60,7 @@ Write in blocks that divide the page. A lane fills its 16 pages only if
 the write size divides one; anything else strands what is left of each
 page, sixteen times over.
 
-- A short write before page-sized ones costs the rest of its page. One
+- At bs=4096, a write of less than a page costs the whole page. One
   byte first, then bs=4096, and the lane holds 61441.
 - dd's count is not what is in the lane. A write that blocks is never
   counted, so at bs=131072 dd reported 0 bytes with a full 65536 sitting
