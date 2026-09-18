@@ -47,8 +47,14 @@ A lane is a file. Write it with >. Read it with <, bounded.
 
 ## Moving bulk with dd
 
-    dd if=file of="$d/0" bs=4096
-    timeout 1 dd if="$d/1" of=file bs=4096
+dd reads stdin and writes stdout unless told otherwise, so `if=` and
+`of=` are overrides, not requirements:
+
+    printf '%s' "$bytes" | dd of="$d/0" bs=4096
+    timeout 1 dd if="$d/1" bs=4096
+    dd if="$a/0" of="$b/0" bs=4096
+
+Stdin into a lane, a lane to stdout, and one pipe into another.
 
 Write in blocks that divide the page. A lane fills its 16 pages only if
 the write size divides one; anything else strands what is left of each
