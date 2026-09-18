@@ -52,9 +52,13 @@ overriding the interpreter, not the harness being broken.
 - **Small.** If a file is getting long, you are adding scope, not features.
 - **No speculative work.** Build what is asked, not what might be asked later.
 - **No abstraction until there are two real callers.**
-- **Facts, not recipes.** SKILL.md states what the OS primitive does. It does
-  not tell the caller how to wait, poll, frame, or spread a payload over
-  lanes. The read-and-write section is two commands and never grows.
+- **Facts, and examples that were run.** SKILL.md states what the OS primitive
+  does and shows how to work it. An example earns its place by having been run
+  here, and carries whatever explanation it takes to use correctly: a caller
+  who follows one and gets a number other than the one written down has been
+  misled. Every figure in it is measured, not reasoned to. What SKILL.md still
+  does not do is tell the caller what to send, how to frame it, or what any of
+  it means.
 - **Bash, and the shebang decides.** Every script here is bash and says so on
   its first line. Run one by its path and let that line choose the
   interpreter. Never reach for `sh script` or `bash script`: that overrides
