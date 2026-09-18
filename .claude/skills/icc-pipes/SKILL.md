@@ -45,6 +45,27 @@ A lane is a file. Write it with >. Read it with <, bounded.
     printf '%s' "$bytes" > "$d/0"
     timeout 1 cat "$d/1"
 
+## Moving bulk with dd
+
+    dd if=file of="$d/0" bs=4096
+    timeout 1 dd if="$d/1" of=file bs=4096
+
+Write in blocks that divide the page. A lane fills its 16 pages only if
+the write size divides one; anything else strands what is left of each
+page, sixteen times over.
+
+- bs=4096 fills a lane. bs=2049 puts 32784 in it: one byte over half a
+  page costs half the lane.
+- A short write before page-sized ones costs the rest of its page. One
+  byte first, then bs=4096, and the lane holds 61441.
+- dd's count is not what is in the lane. A write that blocks is never
+  counted, so at bs=131072 dd reported 0 bytes with a full 65536 sitting
+  in the lane. Read the lane if you want to know what is in it.
+- A bounded read keeps everything it got, partial last block included,
+  and spends its whole bound, because no lane ever reaches EOF.
+- More than a lane holds needs a reader already draining the far end,
+  or the writer wedges partway in.
+
 ## Holding a lane open
 
 A redirect opens the lane, writes, and closes it, once per command. To
