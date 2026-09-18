@@ -45,65 +45,6 @@ A lane is a file. Write it with >. Read it with <, bounded.
     printf '%s' "$bytes" > "$d/0"
     timeout 1 cat "$d/1"
 
-## Moving bulk with dd
-
-dd reads stdin and writes stdout unless told otherwise, so `if=` and
-`of=` are overrides, not requirements:
-
-    printf '%s' "$bytes" | dd of="$d/0" bs=4096
-    timeout 1 dd if="$d/1" bs=4096
-    dd if="$a/0" of="$b/0" bs=4096
-
-Stdin into a lane, a lane to stdout, and one pipe into another.
-
-Write in blocks that divide the page. A lane fills its 16 pages only if
-the write size divides one; anything else strands what is left of each
-page, sixteen times over.
-
-- At bs=4096, a write of less than a page costs the whole page. One
-  byte first, then bs=4096, and the lane holds 61441.
-- dd's count is not what is in the lane. A write that blocks is never
-  counted, so at bs=131072 dd reported 0 bytes with a full 65536 sitting
-  in the lane. Read the lane if you want to know what is in it.
-- A bounded read keeps everything it got, partial last block included,
-  and spends its whole bound, because no lane ever reaches EOF.
-- More than a lane holds needs a reader already draining the far end,
-  or the writer wedges partway in.
-- A record that is not the page costs capacity, and padding one out to
-  the page costs correctness, since the padding is bytes the peer reads.
-  obs= costs neither: dd gathers what it reads into page-sized writes
-  and adds nothing. `ibs=<record> obs=4096` fills a lane from records of
-  any size, checked at 3, 1000, 2049 and 5000 bytes, holding 65536 every
-  time with the stream arriving byte-identical. dd is the only shell
-  command with a write-size knob at all; cat, tee, cp, head, tail and
-  split have none.
-- dd between two pipes carries one block and nothing else, so a chain
-  of N pipes holds 16N + (N - 1) pages: 65536, 135168, 204800 and
-  274432 for N of 1 to 4, at bs=4096. Each pipe brings its 16 pages,
-  and each joint brings the one page that a block has to be.
-- cat in that same place carries whatever it happens to hold when the
-  chain wedges, measured from 12288 to 65536 over four runs of one
-  setup. It moves the bytes correctly and its share cannot be stated,
-  so a chain built on cat has no capacity you can name.
-
-## Holding a lane open
-
-A redirect opens the lane, writes, and closes it, once per command. To
-write many times without reopening, hold it on a file descriptor:
-
-    exec 3<>"$d/0"
-    printf '%s' "$bytes" >&3
-    exec 3>&-
-
-`<>` is the open that never blocks, which is why it is the one here.
-What holding an fd does and does not do:
-
-- It opens both ways, so you are also a reader of the lane you write.
-- Closing it signals nothing. The hold keeps a writer open, so no reader
-  sees EOF, and an idiom that waits for one waits forever.
-- The fd dies with the shell. In Claude Code that is one Bash call, so
-  an fd never spans two of them. The hold is a process for this reason.
-
 ## Facts about the pipe
 
 These are properties of a FIFO. The skill adds nothing to them. Where
@@ -112,19 +53,10 @@ Linux and POSIX differ, both are given; this skill is Linux.
 - A write of at most PIPE_BUF bytes lands whole. Larger writes can
   interleave with another writer's. PIPE_BUF is 4096 on Linux; POSIX
   promises only 512. `getconf PIPE_BUF /tmp` says.
-- Each lane is 16 pages on Linux, not a flat 64K; POSIX promises only
-  PIPE_BUF. A write past the buffer blocks until someone reads. Lanes
-  fill and drain independently, so N lanes is N times the bytes in
-  flight. More lanes is more bandwidth, nothing else.
-- The 64K is only there for write sizes that divide the page. A write
-  that will not fit in what is left of the current page starts a new one
-  and strands the rest, once per page, sixteen times over: the lane
-  holds 16 x floor(page / size) x size. On a 4096 page, 2048 fills the
-  lane and 2049 holds 32784, so one byte of write size blocks the writer
-  32752 bytes early. Nothing written is lost, only the room to write it.
-  The page is 4096 on x86-64 and larger elsewhere, which is where the
-  64K comes from; PIPE_BUF is a separate 4096 that only looks like the
-  same number here. `getconf PAGESIZE` and `getconf PIPE_BUF /tmp` say.
+- Each lane buffers 64K on Linux; POSIX promises only PIPE_BUF. A write
+  past the buffer blocks until someone reads. Lanes fill and drain
+  independently, so N lanes is N times the bytes in flight. More lanes
+  is more bandwidth, nothing else.
 - A read on an empty lane blocks, and never sees EOF while the pipe is
   up, because the hold keeps a writer open. Bound every read (timeout,
   nonblocking) or the call hangs.
@@ -133,8 +65,6 @@ Linux and POSIX differ, both are given; this skill is Linux.
   and exits 124. That status is the bound, not a failure, and the read
   costs the bound every time.
 - Bytes read are gone. Nothing is kept.
-- `>` on a lane does not truncate. Bytes leave when someone reads
-  them and at no other time.
 - Order holds within one lane and nowhere else.
 - The hold opens every lane O_RDWR. On Linux that open never blocks.
   POSIX leaves it undefined.
