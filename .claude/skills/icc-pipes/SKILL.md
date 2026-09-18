@@ -45,6 +45,24 @@ A lane is a file. Write it with >. Read it with <, bounded.
     printf '%s' "$bytes" > "$d/0"
     timeout 1 cat "$d/1"
 
+## Holding a lane open
+
+A redirect opens the lane, writes, and closes it, once per command. To
+write many times without reopening, hold it on a file descriptor:
+
+    exec 3<>"$d/0"
+    printf '%s' "$bytes" >&3
+    exec 3>&-
+
+`<>` is the open that never blocks, which is why it is the one here.
+What holding an fd does and does not do:
+
+- It opens both ways, so you are also a reader of the lane you write.
+- Closing it signals nothing. The hold keeps a writer open, so no reader
+  sees EOF, and an idiom that waits for one waits forever.
+- The fd dies with the shell. In Claude Code that is one Bash call, so
+  an fd never spans two of them. The hold is a process for this reason.
+
 ## Facts about the pipe
 
 These are properties of a FIFO. The skill adds nothing to them. Where
@@ -73,6 +91,8 @@ Linux and POSIX differ, both are given; this skill is Linux.
   and exits 124. That status is the bound, not a failure, and the read
   costs the bound every time.
 - Bytes read are gone. Nothing is kept.
+- `>` on a lane does not truncate. Bytes leave when someone reads
+  them and at no other time.
 - Order holds within one lane and nowhere else.
 - The hold opens every lane O_RDWR. On Linux that open never blocks.
   POSIX leaves it undefined.
