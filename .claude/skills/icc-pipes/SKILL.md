@@ -69,6 +69,14 @@ page, sixteen times over.
   and spends its whole bound, because no lane ever reaches EOF.
 - More than a lane holds needs a reader already draining the far end,
   or the writer wedges partway in.
+- dd between two pipes carries one block and nothing else, so a chain
+  of N pipes holds 16N + (N - 1) pages: 65536, 135168, 204800 and
+  274432 for N of 1 to 4, at bs=4096. Each pipe brings its 16 pages,
+  and each joint brings the one page that a block has to be.
+- cat in that same place carries whatever it happens to hold when the
+  chain wedges, measured from 12288 to 65536 over four runs of one
+  setup. It moves the bytes correctly and its share cannot be stated,
+  so a chain built on cat has no capacity you can name.
 
 ## Holding a lane open
 
