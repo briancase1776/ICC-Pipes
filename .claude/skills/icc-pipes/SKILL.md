@@ -69,6 +69,14 @@ page, sixteen times over.
   and spends its whole bound, because no lane ever reaches EOF.
 - More than a lane holds needs a reader already draining the far end,
   or the writer wedges partway in.
+- A record that is not the page costs capacity, and padding one out to
+  the page costs correctness, since the padding is bytes the peer reads.
+  obs= costs neither: dd gathers what it reads into page-sized writes
+  and adds nothing. `ibs=<record> obs=4096` fills a lane from records of
+  any size, checked at 3, 1000, 2049 and 5000 bytes, holding 65536 every
+  time with the stream arriving byte-identical. dd is the only shell
+  command with a write-size knob at all; cat, tee, cp, head, tail and
+  split have none.
 - dd between two pipes carries one block and nothing else, so a chain
   of N pipes holds 16N + (N - 1) pages: 65536, 135168, 204800 and
   274432 for N of 1 to 4, at bs=4096. Each pipe brings its 16 pages,
