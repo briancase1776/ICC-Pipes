@@ -53,10 +53,16 @@ Linux and POSIX differ, both are given; this skill is Linux.
 - A write of at most PIPE_BUF bytes lands whole. Larger writes can
   interleave with another writer's. PIPE_BUF is 4096 on Linux; POSIX
   promises only 512. `getconf PIPE_BUF /tmp` says.
-- Each lane buffers 64K on Linux; POSIX promises only PIPE_BUF. A write
-  past the buffer blocks until someone reads. Lanes fill and drain
-  independently, so N lanes is N times the bytes in flight. More lanes
-  is more bandwidth, nothing else.
+- Each lane is 16 pages of 4096 on Linux, not a flat 64K; POSIX promises
+  only PIPE_BUF. A write past the buffer blocks until someone reads.
+  Lanes fill and drain independently, so N lanes is N times the bytes in
+  flight. More lanes is more bandwidth, nothing else.
+- The 64K is only there for write sizes that divide a page. A write of
+  at most PIPE_BUF never straddles a page, so what is left of a page
+  when the next write will not fit is stranded, sixteen times over: the
+  lane holds 16 x floor(4096 / size) x size. 4096 or 2048 fills it, 2049
+  holds 32784, half the lane lost to one byte. A larger write does
+  straddle, and lands between the two.
 - A read on an empty lane blocks, and never sees EOF while the pipe is
   up, because the hold keeps a writer open. Bound every read (timeout,
   nonblocking) or the call hangs.
