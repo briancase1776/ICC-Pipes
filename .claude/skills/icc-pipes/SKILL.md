@@ -60,8 +60,6 @@ Write in blocks that divide the page. A lane fills its 16 pages only if
 the write size divides one; anything else strands what is left of each
 page, sixteen times over.
 
-- bs=4096 fills a lane. bs=2049 puts 32784 in it: one byte over half a
-  page costs half the lane.
 - A short write before page-sized ones costs the rest of its page. One
   byte first, then bs=4096, and the lane holds 61441.
 - dd's count is not what is in the lane. A write that blocks is never
@@ -106,10 +104,11 @@ Linux and POSIX differ, both are given; this skill is Linux.
   that will not fit in what is left of the current page starts a new one
   and strands the rest, once per page, sixteen times over: the lane
   holds 16 x floor(page / size) x size. On a 4096 page, 2048 fills the
-  lane and 2049 holds 32784, half of it lost to one byte. The page is
-  4096 on x86-64 and larger elsewhere, which is where the 64K comes
-  from; PIPE_BUF is a separate 4096 that only looks like the same
-  number here. `getconf PAGESIZE` and `getconf PIPE_BUF /tmp` say.
+  lane and 2049 holds 32784, so one byte of write size blocks the writer
+  32752 bytes early. Nothing written is lost, only the room to write it.
+  The page is 4096 on x86-64 and larger elsewhere, which is where the
+  64K comes from; PIPE_BUF is a separate 4096 that only looks like the
+  same number here. `getconf PAGESIZE` and `getconf PIPE_BUF /tmp` say.
 - A read on an empty lane blocks, and never sees EOF while the pipe is
   up, because the hold keeps a writer open. Bound every read (timeout,
   nonblocking) or the call hangs.
